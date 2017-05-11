@@ -1,0 +1,274 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>THREE.js webgl - Computation Geometry - Parabolic Lift Visualization</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            font-family: Monospace;
+            background-color: #f0f0f0;
+            margin: 0px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<script src="src/lib/three.js"></script>
+<script src="src/lib/OrbitControls.js"></script>
+<script src="src/lib/TransformControls.js"></script>
+<script src="src/lib/DragControls.js"></script>
+<script src="src/lib/stats.min.js"></script>
+
+<script src="src/Paraboloid.js"></script>
+<script src="src/Point2D.js"></script>
+<script src="src/Plane.js"></script>
+<script src="src/PlaneSideTester.js"></script>
+
+<script>
+    /*
+    *  The design and development of this project are
+    *  heavily based on the work found in the spline editor
+    *  example provided on the three.js website at:
+    *  https://threejs.org/examples/#webgl_geometry_spline_editor
+    */
+
+    var container, stats;
+    var camera, scene, renderer;
+    var globalDict = {};
+    var options;
+
+    init();
+    animate();
+
+    function init() {
+
+        container = document.createElement( 'div' );
+        document.body.appendChild( container );
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+        //camera = new THREE.PerspectiveCamera( 45, 640 / 480, 1, 10000 );
+        camera.position.z = 3; //10
+        scene.add( camera );
+
+        scene.add( new THREE.AmbientLight( 0xf0f0f0 ) );
+
+        var circlePoints = []; //used to make points draggable
+
+        /*
+         * An useful example of parametric geometries found at:
+         * http://mathinsight.org/applet/graph_elliptic_paraboloid_2
+        */
+        var paraboloid = new Paraboloid();
+        scene.add(paraboloid.getGroup());
+        globalDict['paraboloid'] = paraboloid.getGroup();
+
+        var a = new Point2D( .5 , .0 );
+        circlePoints.push(a.getPointMesh());
+        scene.add(a.getPointMesh() );
+        scene.add(a.getLiftedPointMesh() );
+        scene.add(a.getLineMesh() );
+
+        var b = new Point2D( .0, .5 );
+        circlePoints.push(b.getPointMesh());
+
+        scene.add(b.getPointMesh() );
+        scene.add(b.getLiftedPointMesh() );
+        scene.add(b.getLineMesh() );
+
+        var c = new Point2D(.5 , .5 );
+        circlePoints.push(c.getPointMesh());
+        scene.add(c.getPointMesh() );
+        scene.add(c.getLiftedPointMesh() );
+        scene.add(c.getLineMesh() );
+
+        var q = new Point2D(.25 , .25 );
+        globalDict['q'] = q;
+        circlePoints.push(q.getPointMesh());
+        scene.add(q.getPointMesh() );
+        scene.add(q.getLiftedPointMesh() );
+        scene.add(q.getLineMesh() );
+
+        var planeSideTester = new PlaneSideTester(a,b,c,q);
+
+        var liftPlane = new Plane(a,b,c);
+        var planeGroup = liftPlane.getGroup();
+        globalDict['plane'] = planeGroup;
+        scene.add(planeGroup);
+
+        //GridHelper is the "floor" grid
+        GRID_SIZE = 1;
+        GRID_STEP = 20; //the number of ticks across -10 to 10 for step = 20
+        var helper = new THREE.GridHelper( GRID_SIZE, GRID_STEP );
+        helper.position.y = 0; //was -199
+        helper.material.opacity = 0.25;
+        helper.material.transparent = true;
+        scene.add( helper );
+
+        renderer = new THREE.WebGLRenderer( { antialias: false } );
+        renderer.setClearColor( 0xf0f0f0 );
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( window.innerWidth, window.innerHeight );//old window size settings
+        renderer.shadowMap.enabled = true;
+        container.appendChild( renderer.domElement );
+
+        var info = document.createElement( 'div' );
+        info.style.position = 'absolute';
+        info.style.top = '10px';
+        info.style.width = '100%';
+        info.style.textAlign = 'center';
+        info.innerHTML = 'The 2d→3d Parabolic Lift';
+        options = document.createElement( 'div' );
+        options.style.position = 'absolute';
+        options.style.top = '30px';
+        options.style.width = '100%';
+        options.style.textAlign = 'center';
+
+        options.innerHTML = '<input type="checkbox" id="paraboloid" checked /> <label for="paraboloid">Show Paraboloid</label><br />\
+					<input type="checkbox" id="plane" checked />Show Plane<br />\
+					<input type="checkbox" id="query" checked />Show Query Point<br />';
+
+        container.appendChild( info );
+        container.appendChild( options );
+
+        stats = new Stats(); //used for monitoring FPS
+        container.appendChild( stats.dom );
+
+        // Controls
+        controls = new THREE.OrbitControls( camera, renderer.domElement );
+        controls.damping = 0.2;
+        controls.addEventListener( 'change', render );
+        transformControl = new THREE.TransformControls( camera, renderer.domElement );
+        transformControl.addEventListener( 'change', render );
+        scene.add( transformControl );
+
+        // Hiding transform situation is a little in a mess :()
+        transformControl.addEventListener( 'change', function( e ) {
+            cancelHideTransorm();
+        } );
+        transformControl.addEventListener( 'mouseDown', function( e ) {
+            cancelHideTransorm();
+        } );
+        transformControl.addEventListener( 'mouseUp', function( e ) {
+            delayHideTransform();
+        } );
+        transformControl.addEventListener( 'objectChange', function( e ) {
+            liftPlane.adjust();
+            q.updateLocation();
+            planeSideTester.update(a,b,c,q);
+
+        } );
+
+        dragcontrols = new THREE.DragControls( camera, circlePoints, renderer.domElement ); //
+        transformControl.attach(circlePoints[0]);
+
+        dragcontrols.on( 'hoveron', function( e ) {
+
+            transformControl.attach( e.object );
+            cancelHideTransorm(); // *
+
+        } );
+
+        dragcontrols.on( 'hoveroff', function( e ) {
+
+            if ( e ) delayHideTransform();
+
+        } );
+        controls.addEventListener( 'start', function() {
+
+            cancelHideTransorm();
+
+        } );
+        controls.addEventListener( 'end', function() {
+
+            delayHideTransform();
+
+        } );
+
+
+
+        var hiding;
+        function delayHideTransform() {
+
+            cancelHideTransorm();
+            hideTransform();
+
+        }
+        function hideTransform() {
+
+            hiding = setTimeout( function() {
+
+                transformControl.detach( transformControl.object );
+
+            }, 2500 )
+
+        }
+        function cancelHideTransorm() {
+
+            if ( hiding ) clearTimeout( hiding );
+
+        }
+
+
+        window.onkeyup = function(e) {
+            var key = e.keyCode ? e.keyCode : e.which;
+
+            if (key == 38) {
+                controls.enabled = false;
+            }else if (key == 40) {
+                controls.enabled = true;
+            }else if (key == 49) {
+                transformControl.attach(circlePoints[0]);
+            }else if (key == 50) {
+                transformControl.attach(circlePoints[1]);
+            }else if (key == 51) {
+                transformControl.attach(circlePoints[2]);
+            }else if (key == 81) {
+                transformControl.attach(circlePoints[3]);
+            }
+        };
+    }
+
+
+    function animate() {
+
+        requestAnimationFrame( animate );
+        render();
+        stats.update();
+        controls.update();
+        transformControl.update();
+
+    }
+
+    function render() {
+
+        globalDict['paraboloid'].visible = paraboloid.checked;
+        globalDict['plane'].visible = plane.checked;
+        globalDict['q'].getLiftedPointMesh().visible = query.checked;
+        globalDict['q'].getPointMesh().visible = query.checked;
+        globalDict['q'].getLineMesh().visible = query.checked;
+        renderer.render( scene, camera );
+    }
+
+// http://stackoverflow.com/questions/641857/javascript-window-resize-event
+    var addEvent = function(object, type, callback) {
+        if (object == null || typeof(object) == 'undefined') return;
+        if (object.addEventListener) {
+            object.addEventListener(type, callback, false);
+        } else if (object.attachEvent) {
+            object.attachEvent("on" + type, callback);
+        } else {
+            object["on"+type] = callback;
+        }
+    };
+
+// http://stackoverflow.com/questions/641857/javascript-window-resize-event
+    addEvent(window, "resize", function(event) {
+        renderer.setSize( window.innerWidth, window.innerHeight );
+    });
+
+</script>
+</body>
+</html>
