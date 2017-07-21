@@ -26,7 +26,8 @@
 <script src="src/Point2D.js"></script>
 <script src="src/Plane.js"></script>
 <script src="src/PlaneSideTester.js"></script>
-
+<script src="src/Circle2D.js"></script>
+<script src="src/Bisector2D.js"></script>
 <script>
     /*
     *  The design and development of this project are
@@ -88,8 +89,11 @@
         globalDict['q'] = q;
         circlePoints.push(q.getPointMesh());
         scene.add(q.getPointMesh() );
-        scene.add(q.getLiftedPointMesh() );
+        scene.add(q.getLiftedPointMesh());
         scene.add(q.getLineMesh() );
+
+        var circle = new Circle2D(a,b,c);
+        scene.add( circle.getCircleMesh() );
 
         var planeSideTester = new PlaneSideTester(a,b,c,q);
 
