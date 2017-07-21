@@ -4,8 +4,9 @@
 
 function Circle2D(a,b,c){
 
-    this.ab = this.getBisector(a,b);
-    this.bc = this.getBisector(b,c);
+    this.ab = this.getBisector(a,b)
+    // using b,c doesn't work, most likely because of how findCircumcenter() is calculated. Fix later.
+    this.ac = this.getBisector(a,c);
 
     //find intersection of both bisectors
     this.center = this.findCircumcenter();
@@ -41,10 +42,10 @@ Circle2D.prototype.getVector3 = function(){
 
 Circle2D.prototype.adjust = function(a,b,c) {
     this.ab = this.getBisector(a,b);
-    this.bc = this.getBisector(b,c);
+    this.ac = this.getBisector(a,c);
 
     //find intersection of both bisectors
-    this.center = this.getCircumcenter(ab,bc);
+    this.center = this.findCircumcenter(ab,ac);
 
 
     //calculate radius
@@ -59,16 +60,10 @@ Circle2D.prototype.getBisector = function(a,b) {
     return new Bisector2D(midX, midY, slope);
 };
 
-// Arbitrarily use bisectors ab and bc to find the circumcenter
+// Arbitrarily use bisectors ab and ac to find the circumcenter
 Circle2D.prototype.findCircumcenter = function(){
-    foundX = (-this.bc.getM()*this.bc.getX()+this.bc.getY()+this.ab.getM()*this.ab.getX()-this.ab.getY())/(this.ab.getM()-this.bc.getM());
-    foundY = this.bc.getM()*foundX - this.bc.getM()*this.bc.getX()+this.bc.getY();
+    foundX = (-this.ac.getM()*this.ac.getX()+this.ac.getY()+this.ab.getM()*this.ab.getX()-this.ab.getY())/(this.ab.getM()-this.ac.getM());
+    foundY = this.ac.getM()*foundX - this.ac.getM()*this.ac.getX()+this.ac.getY();
     console.log(new THREE.Vector3(foundX, 0, foundY));
     return new THREE.Vector3(foundX, 0, foundY);
-
-};
-
-// Arbitrarily use distance from center to point a
-Circle2D.prototype.findRadius = function(){
-    this.center.getComponent(0)
 };
