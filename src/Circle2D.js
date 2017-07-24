@@ -1,5 +1,10 @@
-/**
- * Created by Lynn Asselin on 7/20/17.
+/*
+ *  Circle2D.js
+ *  *************Copyright***************
+ *  Copyright 2016 Lynn Asselin II
+ *  *************License*****************
+ *  Creative Commons 4.0 Attribution + ShareAlike license:
+ *  https://en.wikipedia.org/wiki/Creative_Commons_license
  */
 
 function Circle2D(a,b,c){
@@ -73,7 +78,6 @@ Circle2D.prototype.getBisector = function(a,b) {
     return new Bisector2D(midX, midY, slope);
 };
 
-// Arbitrarily use bisectors ab and ac to find the circumcenter
 // Arbitrarily use bisectors ab and ac to find the circumcenter
 Circle2D.prototype.findCircumcenter = function(){
     foundX = (this.ab.getM()*this.ab.getX()-this.ab.getY()-this.ac.getM()*this.ac.getX()+this.ac.getY()) / (this.ab.getM()-this.ac.getM());

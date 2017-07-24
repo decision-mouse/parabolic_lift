@@ -30,10 +30,11 @@
 <script src="src/Bisector2D.js"></script>
 <script>
     /*
-    *  The design and development of this project are
-    *  heavily based on the work found in the spline editor
-    *  example provided on the three.js website at:
-    *  https://threejs.org/examples/#webgl_geometry_spline_editor
+     *  *************DISCLAIMER**************
+     *  The inspiration for the design of this project is based
+     *  heavily on the work found in the spline editor example
+     *  provided on the three.js website at:
+     *  https://threejs.org/examples/#webgl_geometry_spline_editor
     */
 
     var container, stats;
@@ -50,7 +51,6 @@
         document.body.appendChild( container );
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
-        //camera = new THREE.PerspectiveCamera( 45, 640 / 480, 1, 10000 );
         camera.position.z = 3; //10
         scene.add( camera );
 
@@ -62,17 +62,18 @@
          * An useful example of parametric geometries found at:
          * http://mathinsight.org/applet/graph_elliptic_paraboloid_2
         */
+
         var paraboloid = new Paraboloid();
         scene.add(paraboloid.getGroup());
         globalDict['paraboloid'] = paraboloid.getGroup();
-        // x: 0.5, y: 0, z: -0.9807171019108515
-        var a = new Point2D( 1.025754044159945 , 0.9807171019108515 );
+
+        var a = new Point2D( .5 , 0 );
         circlePoints.push(a.getPointMesh());
         scene.add(a.getPointMesh() );
         scene.add(a.getLiftedPointMesh() );
         scene.add(a.getLineMesh() );
 
-        var b = new Point2D( .0, .5 );
+        var b = new Point2D( 0, .5 );
         circlePoints.push(b.getPointMesh());
 
         scene.add(b.getPointMesh() );
@@ -160,9 +161,7 @@
         } );
         transformControl.addEventListener( 'objectChange', function( e ) {
             liftPlane.adjust();
-            //circle.update(a,b,c);
-            scene.remove(circle.getCircleMesh());
-            circle = new Circle2D(a,b,c);
+            circle.update(a,b,c);
             scene.add( circle.getCircleMesh() );
             q.updateLocation();
             planeSideTester.update(a,b,c,q);

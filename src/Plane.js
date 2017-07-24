@@ -1,5 +1,10 @@
-/**
- * old color: 0xff4f38
+/*
+ *  Plane.js
+ *  *************Copyright***************
+ *  Copyright 2016 Lynn Asselin II
+ *  *************License*****************
+ *  Creative Commons 4.0 Attribution + ShareAlike license:
+ *  https://en.wikipedia.org/wiki/Creative_Commons_license
  */
 
 function Plane(a,b,c) {
@@ -75,7 +80,7 @@ Plane.prototype.adjust = function() {
     scene.add(this.group);
 
 };
-
+// The following 4 functions generate the 4 pieces of the plane which the parametric geometry constructs on some interval
 Plane.prototype.f_planeQ1 = function(p1, p2, p3){
     //plane scalars
     var width = 10;

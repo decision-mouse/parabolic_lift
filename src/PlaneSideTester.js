@@ -1,5 +1,10 @@
-/**
- *
+/*
+ *  PlaneSideTester.js
+ *  *************Copyright***************
+ *  Copyright 2016 Lynn Asselin II
+ *  *************License*****************
+ *  Creative Commons 4.0 Attribution + ShareAlike license:
+ *  https://en.wikipedia.org/wiki/Creative_Commons_license
  */
 
 function PlaneSideTester(a,b,c,d){

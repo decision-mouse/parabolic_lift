@@ -1,13 +1,16 @@
-/**
- *
- * old color: 0x9932CC
+/*
+ *  Point2D.js
+ *  *************Copyright***************
+ *  Copyright 2016 Lynn Asselin II
+ *  *************License*****************
+ *  Creative Commons 4.0 Attribution + ShareAlike license:
+ *  https://en.wikipedia.org/wiki/Creative_Commons_license
  */
 
 function Point2D(x,y,color=0xf6b132){
-    //x and y are ideally in the world coordinates
+    //x and y are ideally in "world" coordinates
 
     this.color = color;
-
     this.x = x;
     this.y = -y;
     this.z = this.x*this.x+this.y*this.y;
@@ -16,8 +19,6 @@ function Point2D(x,y,color=0xf6b132){
     this.pointGeom.rotateX( - Math.PI / 2 );
     this.pointMaterial = new THREE.MeshLambertMaterial({
         color: this.color,
-        //opacity: 0.1,
-        //transparent: false,
         side: THREE.DoubleSide,
         depthWrite: true
     });
@@ -52,9 +53,6 @@ Point2D.prototype.getVector3 = function(){
     return this.pointMesh.position;
 };
 
-Point2D.prototype.getLiftedVector3 = function(){
-    return new THREE.Vector3(this.x,this.z,this.y);
-};
 
 Point2D.prototype.getPosition = function(){
     return this.liftedPointMesh.position;
@@ -78,7 +76,6 @@ Point2D.prototype.updateLocation = function(){
 
     this.y = this.x*this.x+this.z*this.z;
     this.liftedPointMesh.position.set(this.x, this.y, this.z);
-    //console.log('point location' , this.pointMesh.position);
     scene.remove(this.lineMesh);
     this.lineGeometry = new THREE.Geometry();
     this.lineGeometry.vertices.push(this.pointMesh.position);

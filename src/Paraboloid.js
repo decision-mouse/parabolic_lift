@@ -1,7 +1,10 @@
 /*
- *
- *
- *
+ *  Paraboloid.js
+ *  *************Copyright***************
+ *  Copyright 2016 Lynn Asselin II
+ *  *************License*****************
+ *  Creative Commons 4.0 Attribution + ShareAlike license:
+ *  https://en.wikipedia.org/wiki/Creative_Commons_license
  */
 
 function Paraboloid(){
@@ -9,12 +12,10 @@ function Paraboloid(){
     this.Nu = 25;
     this.Nv = 25;
 
-
     this.paraboloidMaterial = new THREE.MeshLambertMaterial({
         side: THREE.DoubleSide,
         color:0xc7f6f5,
         depthWrite: true,
-        //lights: false,
         transparent: true,
         opacity:.7
     });
