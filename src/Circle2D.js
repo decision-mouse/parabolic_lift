@@ -48,7 +48,7 @@ Circle2D.prototype.update = function(a,b,c) {
     );
 
     //draw circle
-    this.circleGeom = new THREE.CircleBufferGeometry(this.radius, 32 ); //radius,segments
+    this.circleGeom = new THREE.CircleBufferGeometry(this.radius, 64 ); //radius,segments
     this.circleMaterial = new THREE.MeshBasicMaterial( {
         color: 0x6e338e,
         opacity:.3,
