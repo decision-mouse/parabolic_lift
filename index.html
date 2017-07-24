@@ -65,8 +65,8 @@
         var paraboloid = new Paraboloid();
         scene.add(paraboloid.getGroup());
         globalDict['paraboloid'] = paraboloid.getGroup();
-
-        var a = new Point2D( .5 , .0 );
+        // x: 0.5, y: 0, z: -0.9807171019108515
+        var a = new Point2D( 1.025754044159945 , 0.9807171019108515 );
         circlePoints.push(a.getPointMesh());
         scene.add(a.getPointMesh() );
         scene.add(a.getLiftedPointMesh() );
@@ -160,6 +160,10 @@
         } );
         transformControl.addEventListener( 'objectChange', function( e ) {
             liftPlane.adjust();
+            //circle.update(a,b,c);
+            scene.remove(circle.getCircleMesh());
+            circle = new Circle2D(a,b,c);
+            scene.add( circle.getCircleMesh() );
             q.updateLocation();
             planeSideTester.update(a,b,c,q);
 

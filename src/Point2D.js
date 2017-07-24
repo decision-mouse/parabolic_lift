@@ -49,7 +49,7 @@ Point2D.prototype.getLineMesh = function(){
 };
 
 Point2D.prototype.getVector3 = function(){
-    return new THREE.Vector3(this.x,0,this.y);
+    return this.pointMesh.position;
 };
 
 Point2D.prototype.getLiftedVector3 = function(){
@@ -58,10 +58,6 @@ Point2D.prototype.getLiftedVector3 = function(){
 
 Point2D.prototype.getPosition = function(){
     return this.liftedPointMesh.position;
-};
-
-Point2D.prototype.getLocation = function(){
-    return this.pointMesh.position;
 };
 
 Point2D.prototype.getPointMesh = function(){
@@ -73,15 +69,16 @@ Point2D.prototype.getLiftedPointMesh = function(){
 };
 
 Point2D.prototype.updateLocation = function(){
+    this.x = this.pointMesh.position.getComponent(0);
+    this.z = this.pointMesh.position.getComponent(2);
     //naive fix for restricting three.js' transformcontrols
     if(this.pointMesh.position.getComponent(1)!= 0){
         this.pointMesh.position.set(this.x,0,this.z);
     }
-    this.x = this.pointMesh.position.getComponent(0);
-    this.z = this.pointMesh.position.getComponent(2);
+
     this.y = this.x*this.x+this.z*this.z;
     this.liftedPointMesh.position.set(this.x, this.y, this.z);
-
+    //console.log('point location' , this.pointMesh.position);
     scene.remove(this.lineMesh);
     this.lineGeometry = new THREE.Geometry();
     this.lineGeometry.vertices.push(this.pointMesh.position);
