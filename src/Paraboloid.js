@@ -51,7 +51,7 @@ Paraboloid.prototype.getGroup = function(){
     return this.group;
 };
 
-
+// Ahead we have 4 functions to generate meshes for all 4 quadrants of the X-Y Plane (+,+),(+,-),(-,+),(-,-)
 Paraboloid.prototype.f_paraQ1 = function(){
     return function (u, v) {
         var x = u;
